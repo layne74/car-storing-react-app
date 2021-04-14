@@ -1,0 +1,21 @@
+{
+  "name": "car-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "car_server.js",
+  "engines": {
+    "node": "12.18.3",
+    "npm": "6.14.6"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node car_server.js"
+  },
+  "author": "",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1"
+  },
+  "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix react-app && npm run build --prefix react-app"
+}
