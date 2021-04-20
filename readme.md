@@ -4,7 +4,7 @@ Car api. Stores and returns information about cars
 
 ## Install 🚀️
 
-Save contents do desired location. Open cmd in current dir. Type ```npm sinstall``` for the node_modules.
+Save contents do desired location. Open cmd in current dir. Type ```npm install``` for the node_modules.
 
 ## Get Postman
 
