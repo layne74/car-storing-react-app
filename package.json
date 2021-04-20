@@ -8,14 +8,21 @@
     "npm": "6.14.6"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node car_server.js"
+    "test": "mocha",
+    "start": "nodemon car_server.js"
   },
   "author": "",
   "license": "UNLICENSED",
   "dependencies": {
     "body-parser": "^1.19.0",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "helmet": "^4.4.1",
+    "nodemon": "2.0.7",
+    "request": "2.88.2"
   },
-  "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix react-app && npm run build --prefix react-app"
+  "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix react-app && npm run build --prefix react-app",
+  "devDependencies": {
+    "chai": "4.3.4",
+    "mocha": "8.3.2"
+  }
 }

@@ -1,19 +1,21 @@
+
 const express = require('express');
 const fs = require('fs');
-const app = express();
+const APP = express();
 const bodyParser = require('body-parser');
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-const port = process.env.PORT || 3001;
-
+const helmet = require("helmet");
+APP.use(bodyParser.urlencoded({ extended: true }));
+APP.use(bodyParser.json());
+APP.use(helmet());
+const PORT = process.env.PORT || 3001;
 
 // UTILITY FUNCTIONS ==========================================================================> 
 // Gets car data, and creates the file if it doesn't exist
 function getCars(){
     try {
-        const content = fs.readFileSync('cars.json')
-        return JSON.parse(content)
-    }catch(e){ // file non-existent
+        const CONTENT = fs.readFileSync('cars.json')
+        return JSON.parse(CONTENT)
+    } catch(e){ // file non-existent
         fs.writeFileSync('cars.json', '[]')
         return []
     }
@@ -21,26 +23,26 @@ function getCars(){
 
 // Adds a new car
 function addCar(name){
-    const cars = getCars()
+    let cars = getCars()
     cars.push(name)
     fs.writeFileSync('cars.json', JSON.stringify(cars))
 }
 
 // Deletes a car
-function deleteCar( id ){
-    const cars = getCars();
-    const index = parseInt(id);
+function deleteCar(id){
+    let cars = getCars();
+    const INDEX = parseInt(id);
     // Alters the object in the array at position i
-    cars.splice(index, 1);
+    cars.splice(INDEX, 1);
     fs.writeFileSync('cars.json', JSON.stringify(cars));
 }
 
 // Edits a car
 function editCar( index, make, model, seats ){
-    const cars = getCars();
+    let cars = getCars();
     // -1 corrects for index difference
     //const index = (parseInt(id));
-    // Alters the object.seats in the array at position i
+    // Alters the object.seats in the array at position "index"
     cars[index].make = make;
     cars[index].model = model;
     cars[index].seats = seats;
@@ -48,15 +50,14 @@ function editCar( index, make, model, seats ){
 }
 
 // Checks if a car exists
-function carExists( n ){
-    const cars = getCars();
+function carExists( position ){
+    const CARS = getCars();
     // Returns a object with a boolean and a index
     let exist = {exists:false, index: null};
-    for (let i = 0; i < cars.length; i++) {
-        if ( cars[i].id === n)  {
+    for (let i = 0; i < CARS.length; i++) {
+        if ( CARS[i].id === position)  {
             exist.exists = true
             exist.index = i
-            console.log("Car Found")
         }
     }
     return exist;
@@ -65,16 +66,16 @@ function carExists( n ){
 // UTILITY FUNCTIONS END =======================================================================> 
 
 // returns the json file with all the cars
-app.get('/api', (req, resp)=>{
-    const cars = getCars()
-    resp.send(cars);
+APP.get('/api', (req, resp)=>{
+    const CARS = getCars()
+    resp.send(CARS);
 })
 
 // create new car
-app.post('/cars/add', (req, resp)=>{
-    const cars = getCars()
-    //const carId = req.body.id;
-    const carId = ((cars.length === 0 ) ? 1 : cars[cars.length - 1].id + 1);
+APP.post('/cars/add', (req, resp)=>{
+    const CARS = getCars()
+    // Const carId = req.body.id;
+    let carId = ((CARS.length === 0 ) ? 1 : CARS[CARS.length - 1].id + 1);
     
     // Checks if the car exists
     let exist = carExists(parseInt(carId));
@@ -82,19 +83,17 @@ app.post('/cars/add', (req, resp)=>{
        resp.send(`Car with id = ${carId} already exists.`)
     }else {
         // New car object
-        /*let carObj = {"id": parseInt(carId), "make": req.query.make,"model": req.query.model,"seats": parseInt(req.query.seats)};*/
         let carObj = {"id": parseInt(carId), "make": req.body.make,"model": req.body.model,"seats": parseInt(req.body.seats), "img": req.body.img};
         
-        console.log(req.body)
         addCar(carObj)
         resp.send("Car added.");
     } 
 
 })
 
-// delete car
-app.delete('/cars/delete', (req, resp) => {
-    const carId = req.body.id;
+// Delete car
+APP.delete('/cars/delete', (req, resp) => {
+    let carId = req.body.id;
     // Checks if the car exists
     let exist = carExists(parseInt(carId));
     if ( exist.exists ) {
@@ -103,17 +102,16 @@ app.delete('/cars/delete', (req, resp) => {
         resp.send("Car deleted.");
      }else {
         resp.send(`Car with id = ${req.body.id} does not exist.`)
-        //resp.status(404).send('Sorry, cant find that');
      }
 })
 
 // Update car info
-app.put('/cars/edit', (req, resp)=>{
-    const carId = req.body.id;
-    const make = req.body.make;
-    const model = req.body.model;
-    const seats = parseInt(req.body.seats);
-    console.log(carId, make, model, seats)
+APP.put('/cars/edit', (req, resp)=>{
+    let carId = req.body.id;
+    let make = req.body.make;
+    let model = req.body.model;
+    let seats = parseInt(req.body.seats);
+    
     // Checks if the car exists
     let exist = carExists(parseInt(carId));
     if ( exist.exists ) {
@@ -127,8 +125,8 @@ app.put('/cars/edit', (req, resp)=>{
 
 // Returns error code 
 if (process.env.NODE_ENV === 'production'){
-    app.use(express.static(path.join(__dirname, 'react-app/build')));
-    app.get('*',(req,res)=> {
+    APP.use(express.static(path.join(__dirname, 'react-app/build')));
+    APP.get('*',(req,res)=> {
         if (res.status === 200) {
             res.sendFile(path.resolve(__dirname, 'react-app', 'build','index.html'));
         }else{
@@ -140,7 +138,7 @@ if (process.env.NODE_ENV === 'production'){
     });
 // DEVELOPMENT 404 
 }else {
-    app.get('*', function(req, res) {
+    APP.get('*', function(req, res) {
         let err = new Error('Page Not Found');
         err.statusCode = 404;
         res.send(err)
@@ -148,4 +146,6 @@ if (process.env.NODE_ENV === 'production'){
 }
 
 // Port listener
-app.listen(port)
+APP.listen(PORT, () =>{
+    console.log(`Server running on port ${PORT}`)
+})
